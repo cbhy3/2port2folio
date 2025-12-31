@@ -1,3 +1,1253 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:95814c96cd35a6831a705195bbeaf68c11ce89f4194b0f02861e6cbd493d110e
-size 52615
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Portfolio - Brian Ch'ng</title>
+    
+        <style>
+            @font-face {
+                font-family: xMarker;
+                src: url(Xmarker.otf);
+            }
+            @font-face {
+                font-family: handwritten;
+                src: url('SEBASTIAN_INFORMAL.otf');
+            }
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                  background:
+                    radial-gradient(
+                        circle at center,
+                        rgba(255, 240, 200, 0.18) 0%,
+                        rgba(255, 240, 200, 0.12) 20%,
+                        rgba(30, 18, 12, 0.85) 55%,
+                        rgba(10, 6, 4, 0.95) 100%
+                    ),
+                    linear-gradient(
+                        135deg,
+                        #1a0f0a 0%,
+                        #0d0705 100%
+                    );
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Georgia', serif;
+                padding: 40px 20px;
+                overflow-x: hidden;
+            }
+            
+            #CoverFront {
+                height: 1500px;
+                width: 1080px;
+                margin: 0 auto;
+                display: block;
+                background-image: url("Images/Cover.jpg");
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: top;
+                border-radius: 8px;
+                position: relative;
+                filter: saturate(70%);
+                box-shadow: 
+                    0 2px 4px rgba(0,0,0,0.1),
+                    0 8px 16px rgba(0,0,0,0.15),
+                    0 16px 32px rgba(0,0,0,0.2),
+                    0 32px 64px rgba(0,0,0,0.25),
+                    inset -3px 0 8px rgba(0,0,0,0.3),
+                    8px 0 0 -2px #f4f1ea,
+                    9px 0 0 -2px #e8e5dc,
+                    10px 0 0 -2px #ddd9ce;
+                cursor: pointer;
+                transition: transform 0.3s ease;
+                z-index: 100;
+            }
+            
+            #CoverFront.hidden {
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.5s ease;
+            }
+            
+            #CoverFront::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: 
+                    linear-gradient(90deg, 
+                        transparent 0%, 
+                        rgba(255,255,255,0.03) 50%, 
+                        transparent 100%);
+                pointer-events: none;
+                border-radius: 8px;
+            }
+            p, h2, li {
+                font-family:handwritten;
+            }
+            li {
+                font-size: 48px;
+
+            }
+            #CoverFront h3 {
+                margin: 0;
+                padding: 200px 80px;
+                color: #f4e4c1;
+                font-size: 96px;
+                font-weight: bold;
+                text-align: center;
+                letter-spacing: 4px;
+                text-transform: uppercase;
+                line-height: 1.3;
+                text-shadow: 
+                    2px 2px 4px rgba(0,0,0,0.8),
+                    -1px -1px 1px rgba(255,255,255,0.1),
+                    0 0 20px rgba(0,0,0,0.5);
+                background: linear-gradient(
+                    145deg,
+                    #c9a961 0%,
+                    #f4e4c1 25%,
+                    #d4af37 50%,
+                    #c9a961 75%,
+                    #f4e4c1 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                position: relative;
+                z-index: 1;
+            }
+            
+            .subtitle {
+                color: #d4c5a0;
+                font-size: 32px;
+                text-align: center;
+                font-style: italic;
+                letter-spacing: 2px;
+                text-shadow: 
+                    1px 1px 2px rgba(0,0,0,0.7),
+                    0 0 10px rgba(0,0,0,0.4);
+                margin-top: -150px;
+                padding: 0 80px;
+            }
+            
+            .author {
+                position: absolute;
+                bottom: 150px;
+                left: 0;
+                right: 0;
+                text-align: center;
+                color: #d4c5a0;
+                font-size: 40px;
+                letter-spacing: 3px;
+                text-transform: uppercase;
+                text-shadow: 
+                    1px 1px 3px rgba(0,0,0,0.8),
+                    0 0 15px rgba(0,0,0,0.5);
+            }
+            
+            #bookContainer {
+                display: none;
+                perspective: 2000px;
+                max-width: 2200px;
+                margin: 0 auto;
+                position: relative;
+                width: 2160px; /* 1080 * 2 for both pages */
+            }
+            
+            #bookContainer.active {
+                display: flex;
+                gap: 0;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            /* Flipping page containers */
+            .flip-page-container {
+                position: absolute;
+                width: 1080px;
+                height: 1500px;
+                z-index: 50;
+                pointer-events: none;
+                transform-style: preserve-3d;
+            }
+            
+            #flipPageContainerRight {
+                left: 1080px; /* Position at the right page (center of book) */
+            }
+            
+            #flipPageContainerLeft {
+                left: 0; /* Position at the left page */
+            }
+            
+            .flip-page {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                transform-style: preserve-3d;
+                transition: transform 1.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+                z-index: 50;
+            }
+            
+            /* Front side (what you see before flipping) */
+            .flip-front {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(to right, #f4f1ea 0%, #fffef9 50%, #f4f1ea 100%);
+                backface-visibility: hidden;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Back side (what appears after flip) */
+            .flip-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(to right, #f4f1ea 0%, #fffef9 50%, #f4f1ea 100%);
+                backface-visibility: hidden;
+                overflow: hidden;
+                transform: rotateY(180deg);
+            }
+            
+            /* For right page flip (forward) */
+            .flip-page.right {
+                transform-origin: left center;
+                left: 0;
+            }
+            
+            .flip-page.right .flip-front {
+                border-radius: 0 8px 8px 0;
+                box-shadow: 
+                    5px 0 15px rgba(0,0,0,0.2),
+                    inset -20px 0 30px rgba(0,0,0,0.08),
+                    0 10px 40px rgba(0,0,0,0.3);
+            }
+            
+            .flip-page.right .flip-front::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 40px;
+                background: linear-gradient(to left, 
+                    rgba(0,0,0,0.15) 0%,
+                    rgba(0,0,0,0.1) 50%,
+                    transparent 100%);
+                left: 0;
+            }
+            
+            .flip-page.right .flip-back {
+                border-radius: 8px 0 0 8px;
+                box-shadow: 
+                    -5px 0 15px rgba(0,0,0,0.2),
+                    inset 20px 0 30px rgba(0,0,0,0.08),
+                    0 10px 40px rgba(0,0,0,0.3);
+            }
+            
+            .flip-page.right .flip-back::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 40px;
+                background: linear-gradient(to right, 
+                    rgba(0,0,0,0.15) 0%,
+                    rgba(0,0,0,0.1) 50%,
+                    transparent 100%);
+                right: 0;
+            }
+            
+            /* For left page flip (backward) */
+            .flip-page.left {
+                transform-origin: right center;
+                right: 0;
+            }
+            
+            .flip-page.left .flip-front {
+                border-radius: 8px 0 0 8px;
+                box-shadow: 
+                    -5px 0 15px rgba(0,0,0,0.2),
+                    inset 20px 0 30px rgba(0,0,0,0.08),
+                    0 10px 40px rgba(0,0,0,0.3);
+            }
+            
+            .flip-page.left .flip-front::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 40px;
+                background: linear-gradient(to right, 
+                    rgba(0,0,0,0.15) 0%,
+                    rgba(0,0,0,0.1) 50%,
+                    transparent 100%);
+                right: 0;
+            }
+            
+            .flip-page.left .flip-back {
+                border-radius: 0 8px 8px 0;
+                box-shadow: 
+                    5px 0 15px rgba(0,0,0,0.2),
+                    inset -20px 0 30px rgba(0,0,0,0.08),
+                    0 10px 40px rgba(0,0,0,0.3);
+            }
+            
+            .flip-page.left .flip-back::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 40px;
+                background: linear-gradient(to left, 
+                    rgba(0,0,0,0.15) 0%,
+                    rgba(0,0,0,0.1) 50%,
+                    transparent 100%);
+                left: 0;
+            }
+            
+            .flip-content {
+                padding: 100px 80px;
+                height: 100%;
+                background-image: url("Images\\LinedPaper.avif");
+                background-size: cover;
+                width: 100%;
+            }
+            
+            .flip-content h2 {
+                 color: #2c1810;
+                font-size: 60px;
+                margin-bottom: 48px;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+            
+            .flip-content p {
+                color: #3d2817;
+                font-size: 38px;
+                line-height: 1.1;
+                text-align: left;
+                text-indent: 40px;
+                margin-bottom: 28px;
+                font-weight:550;
+            }
+            
+            .flip-page-number {
+                position: absolute;
+                bottom: 50px;
+                font-size: 28px;
+                color: #8b7355;
+                font-style: italic;
+            }
+            
+            .flip-page.right .flip-page-number {
+                left: 80px;
+            }
+            
+            .flip-page.left .flip-page-number {
+                right: 80px;
+            }
+            
+            .page {
+                width: 1080px;
+                height: 1500px;
+                background: linear-gradient(to right, #f4f1ea 0%, #fffef9 50%, #f4f1ea 100%);
+                padding: 100px 80px;
+                position: relative;
+                cursor: pointer;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 
+                    0 10px 40px rgba(0,0,0,0.3),
+                    inset 0 0 100px rgba(0,0,0,0.05);
+                background-image: url("Images\\LinedPaper.avif");
+                background-size: cover;
+            }
+            
+            .page::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 40px;
+                background: linear-gradient(to right, 
+                    rgba(0,0,0,0.1) 0%,
+                    transparent 100%);
+                pointer-events: none;
+            }
+            
+            .page-left {
+                border-radius: 8px 0 0 8px;
+                box-shadow: 
+                    -5px 0 15px rgba(0,0,0,0.2),
+                    inset 20px 0 30px rgba(0,0,0,0.08),
+                    0 10px 40px rgba(0,0,0,0.3);
+            }
+            
+            .page-left::before {
+                right: 0;
+            }
+            
+            .page-right {
+                border-radius: 0 8px 8px 0;
+                box-shadow: 
+                    5px 0 15px rgba(0,0,0,0.2),
+                    inset -20px 0 30px rgba(0,0,0,0.08),
+                    0 10px 40px rgba(0,0,0,0.3);
+            }
+            
+            .page-right::before {
+                left: 0;
+                background: linear-gradient(to left, 
+                    rgba(0,0,0,0.1) 0%,
+                    transparent 100%);
+            }
+            
+            .page h2 {
+                color: #2c1810;
+                font-size: 60px;
+                margin-bottom: 48px;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+            .highlight {
+                background-image:
+                    /* main ink */
+                    linear-gradient(
+                        to bottom,
+                        rgba(255, 235, 59, 0.65) 60%,
+                        rgba(255, 235, 59, 0.45) 100%
+                    ),
+                    /* streaks */
+                    repeating-linear-gradient(
+                        -3deg,
+                        rgba(255, 255, 255, 0.15) 0px,
+                        rgba(255, 255, 255, 0.15) 2px,
+                        rgba(255, 235, 59, 0.65) 4px,
+                        rgba(255, 235, 59, 0.65) 6px
+                    ),
+                    /* subtle grain */
+                    repeating-linear-gradient(
+                        90deg,
+                        rgba(0, 0, 0, 0.05) 0px,
+                        rgba(0, 0, 0, 0.05) 1px,
+                        transparent 3px,
+                        transparent 6px
+                    );
+
+                background-size: 100% 0.9em, 100% 0.9em, 100% 0.9em;
+                background-position: 0 85%, 0 85%, 0 85%;
+                background-repeat: repeat-y;
+                border-radius: 0.2em 0.3em 0.25em 0.15em;
+                padding: 0.05em 0.15em;
+                box-decoration-break: clone;
+                -webkit-box-decoration-break: clone;
+                filter: saturate(110%) brightness(105%);
+            }
+
+
+            .page p {
+                color: #3d2817;
+                font-size: 38px;
+                line-height: 1.1;
+                text-align: left;
+                text-indent: 40px;
+                margin-bottom: 28px;
+                font-weight:550;
+            }
+            
+            .page-number {
+                position: absolute;
+                bottom: 50px;
+                font-size: 28px;
+                color: #8b7355;
+                font-style: italic;
+            }
+            
+            .page-left .page-number {
+                left: 80px;
+            }
+            
+            .page-right .page-number {
+                right: 80px;
+            }
+            
+            .hidden {
+                display: none !important;
+            }
+            
+            /* Animation classes */
+            .book-turn {
+                animation: bookTurn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+            }
+            
+            @keyframes bookTurn {
+                0% {
+                    transform: translateX(0) scale(1);
+                }
+                50% {
+                    transform: translateX(20px) scale(0.98);
+                }
+                100% {
+                    transform: translateX(0) scale(1);
+                }
+            }
+            
+            .page-shadow {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0);
+                pointer-events: none;
+                transition: background 0.5s ease;
+                border-radius: 8px;
+                z-index: 5;
+            }
+            
+            .page-shadow.active {
+                background: rgba(0,0,0,0.2);
+            }
+            
+            /* Add a subtle curl effect during flip */
+            .flip-page.curling .flip-front,
+            .flip-page.curling .flip-back {
+                background: linear-gradient(to right, 
+                    #e8e0c9 0%, 
+                    #f4f1ea 10%, 
+                    #fffef9 50%, 
+                    #f4f1ea 90%, 
+                    #e8e0c9 100%);
+            }
+            
+          .polaroid {
+            position: relative;
+            display: inline-block;
+            background: #fff;
+            padding: 14px 14px 30px; /* extra bottom for caption */
+            box-shadow:
+                0 4px 10px rgba(0,0,0,0.25);
+            transform: rotate(-1.2deg);
+            }
+            .polaroid:hover{
+                cursor:zoom-in;
+            }
+            .polaroid img {
+            display: block;
+            width: 100%;
+            }
+                .polaroid video {
+            display: block;
+            width: 100%;
+            }
+            /* Caption area (marker-like text) */
+            .polaroid-caption {
+            margin-top: 10px;
+            text-align: center;
+            font-family: 'Xmarker';
+                
+                
+            font-size: 3rem;
+            color: #222;
+            line-height: 1.2;
+            }
+
+            /* Tape base style */
+            .polaroid::before,
+            .polaroid::after {
+            content: "";
+            position: absolute;
+            width: 70px;
+            height: 22px;
+            background:
+                linear-gradient(
+                135deg,
+                rgba(255,255,255,0.6),
+                rgba(230,230,230,0.6)
+                );
+            opacity: 0.85;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 2;
+            }
+
+            /* Top-left tape */
+            .polaroid::before {
+            top: -10px;
+            left: -18px;
+            transform: rotate(-25deg);
+            }
+
+            /* Top-right tape */
+            .polaroid::after {
+            top: -10px;
+            right: -18px;
+            transform: rotate(22deg);
+            }
+
+            /* Optional bottom tapes */
+            .polaroid .polaroid-caption::before,
+            .polaroid .polaroid-caption::after {
+            content: "";
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            background:
+                linear-gradient(
+                135deg,
+                rgba(255,255,255,0.6),
+                rgba(230,230,230,0.6)
+                );
+            opacity: 0.75;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+
+            .polaroid .polaroid-caption::before {
+            bottom: -18px;
+            left: -10px;
+            transform: rotate(12deg);
+            }
+
+            .polaroid .polaroid-caption::after {
+            bottom: -18px;
+            right: -10px;
+            transform: rotate(-10deg);
+            }
+          .polaroid-row {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            }
+
+            .polaroid {
+            flex: 0 0 auto;
+            }
+            #centered{
+                 margin: 0;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+            }
+            a{
+                text-decoration: none;
+                color:black;
+
+            }
+            a:hover{
+                text-decoration:underline;
+            }
+            ul > li {
+                margin-left: 60px;
+            }
+        </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />    </head>
+    <body>
+        <div id="CoverFront">
+            <h3>Portfolio</h3>
+            <div class="subtitle">A Collection of Works</div>
+            <div class="author">Brian Ch'ng</div>
+        </div>
+        
+        <div id="bookContainer">
+            <!-- Shadow overlay for page flip -->
+            <div class="page-shadow"></div>
+            
+            <!-- Flipping page containers -->
+            <div id="flipPageContainerRight" class="flip-page-container"></div>
+            <div id="flipPageContainerLeft" class="flip-page-container"></div>
+            
+            <!-- Static pages -->
+            <div id="page1" class="page page-left">
+                <h2>Introduction</h2>
+                <p>Hi, I'm currently studying Business and Financial Technology at Nanyang Polytechnic.</p>
+                
+                <p>This is a showcase of my programming projects, and some personal artistic works.</p>
+                
+                <p>Each project will be accompanied by a short description of the project, some context behind the creation of the project, the link to the GitHub Repository, and whatever else I see fit. </p>
+                
+                <p>Enjoy!</p>
+                <div class="page-number">1</div>
+            </div>
+            
+            <div id="page2" class="page page-right">
+                <h2>Table of Contents</h2>
+                <ul>
+                    <li>Introduction ------------------------ 1</li>
+                    <li>Table of Contents ------------------ 2</li>
+                    <li>Projects
+                        <ul>
+                            <li><a onclick="contentPageClick(3, event)">Tossed Out - Flask -------------- 3</a></li>
+                            <li><a onclick="contentPageClick(5, event)">C Turn Based Game -------------- 5</a></li>
+                            <li><a onclick="contentPageClick(7, event)">Find Music - Flask --------------- 7</a></li>
+                            <li><a onclick="contentPageClick(9, event)">JS Guitar Hero Game ------------- 9</a></li>
+                            <li><a onclick="contentPageClick(11, event)">Velonix - C# ASP.Net----------- 11</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                     <a onclick="contentPageClick(13, event)">Art Gallery ------------------------- 13</a></li>
+                </ul>
+                <div class="page-number">2</div>
+            </div>
+            
+            <div id="page3" class="page page-left">
+                <h2>Tossed Out - Web Development Project</h2>
+                <p>This website was made for a school assignment using <span class="highlight">Flask</span> and your usual web development languages; <span class="highlight"> HTMl, CSS, Javascript.</span> The idea behind it is, its a website that sells groceries - but since the assignment spec required the website to have a sustainability angle, it sells groceries that have physical imperfections but are still perfectly safe to eat. </p>
+                <p>By right this was supposed to be a group project, but I ended up doing basically everything in regards to the actual programming, so if I were to list down everything I did, we would be here all day. 
+                    If I had to point out a few notable features, I'd bring up the <span class="highlight">PayNow QR Code generation for payment, the card game minigame </span> which gave <span class="highlight">vouchers and discounts for users who won </span> at the game, and the <span class="highlight">chatbot system using plain Javascript, without generative AI </span>. Everything else in here is essentially your standard shopping website with a staff dashboard and all that nice stuff.
+                </p>
+                <p>Before working on this project, I had no experience or knowledge in Flask, so about 3/4 of the time I spent doing this project was actually just time spent on figuring out Flask. And this was before ChatGPT was actually good at anything, so all I had was just pure reading the documentation and StackOverflow. Impressive right?</p>
+                <a href="https://github.com/cbhy3/webappproj" style="text-decoration: none;color:black;font-size:60px;"><i class="fa-brands fa-github"></i></a>
+                <div class="page-number">3</div>
+            </div>
+            
+            <div id="page4" class="page page-right">
+                <div class="polaroid" >
+                <img src="Images\Tsdout.jpg" alt="Home Page">
+                <div class="polaroid-caption">Home Page</div>
+                </div>
+                <div class="polaroid-row">
+                <div class="polaroid" style="width:50%">
+                    <img src="Images/TosdOutPN.jpg" alt="PayNow QR Code" >
+                    <div class="polaroid-caption">PayNow QR Code Generation</div>
+                </div>
+
+                <div class="polaroid" style="width:35%">
+                    <img src="Images/TsdoutChatbot.jpg" alt="Chatbot System">
+                    <div class="polaroid-caption">Custom Chatbot System</div>
+                </div>
+                </div>
+
+                <div class="page-number">4</div>
+            </div>
+            <div id="page5" class="page page-left">
+                <h2>Turn Based Creature Battler Prototype Game </h2>
+                <p>When I tell people that I have too much free time, this is what I mean. For some reason that even I am unsure of, I decided to attempt to learn the <span class="highlight">C programming language</span>, completely unrelated to anything having to do with school or any of my classes. This "game" is the culmination of this attempt. </p>
+                <p>This game was supposed to be some kind of Turn Based RPG Game, like Pokemon, but I only ever got around to making the Turn Based Battling part. This game was written in <span class="highlight">C, using the SDL Library for graphics</span> and pixel art drawn by me. </p>
+                <p>There are <span class="highlight">4 moves a character can do, melee, projectile, block and move</span>. Melee attacks move you closer to the enemy, and being closer to the enemy allows both you and the opponent to deal more damage. Projectile attacks give some sort of effect based on which creature uses it, and blocking just makes the creature receive less damage and heal a little bit of health. </p>
+                <p>As you can tell I put quite a bit of thought into trying to design some sort of simple but complex battle system, but obviously I'm not a game designer so its not very balanced or good.</p>
+                <p>I also tried to program some sort of AI for enemies, but I gave up halfway through and just made it spam projectile attacks.</p>
+                <a href="https://github.com/cbhy3/toptengamesofalltime" style="text-decoration: none;color:black;font-size:60px;"><i class="fa-brands fa-github"></i></a>
+                <div class="page-number">5</div>
+            </div>
+            
+            <div id="page6" class="page page-right">
+                <div class="polaroid" >
+                <img src="Images\Pokemen1.gif" alt="Battle">
+                <div class="polaroid-caption">Edp vs Doctor Handsome</div>
+                </div>
+                
+                <div class="polaroid" >
+                    <img src="Images/Pokemen2.gif" alt="Battle" style="height:80%" >
+                    <div class="polaroid-caption">The Mogger vs Rat</div>
+                </div>
+
+                
+                
+
+                <div class="page-number">6</div>
+            </div>
+            <div id="page7" class="page page-left">
+                <h2>Find Music - Personal Passion Project</h2>
+                <p>As you will come to see with the next few projects, I like music. I really like music. Words cant describe how much I enjoy music, so I made a website instead. </p>
+                <p>Building upon my knowledge of <span class="highlight">Flask and Python</span> from my school project, I made a website that takes in a list of genres, playlists or an album, and spits out an album recommendation based on that. 
+                    To accomplish this, I used <span class="highlight">Web Scraping (BS4)</span> to get data from a music review website I frequently peruse called AlbumOfTheYear.Org, as well as the <span class="highlight">Spotifty API</span> for handling playlists and album links.
+                </p>
+                <p>To my surprise, this worked really, really well. So well, in fact, some of the recommendations it gave me are albums that ended up as some of my <span class="highlight">most listened to albums this year.</span> It was so beautiful, and it worked so well, and then AlbumOfTheYear.Org had to go and <span class="highlight">upgrade their CloudFlare subscription</span>, and now my <span class="highlight"> web scraping bot gets the boot</span> anytime it tries to scrape. A true crying shame. </p>
+                <p>I tried and I tried, but you can't take down CloudFlare - only CloudFlare itself can do that. Instead of mourning, I'm going to share some of my favourite albums that this website recommended me - it's what the website would have wanted me to do.</p>
+                <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/album/2LF6m9cVyej7vKLnjwGiLK?utm_source=generator" width="100%" height="100" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/album/2DZEwt8Lhz6PuqxsJWF7Ap?utm_source=generator" width="100%" height="100" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <a href="https://github.com/cbhy3/findmusic" style="text-decoration: none;color:black;font-size:60px;"><i class="fa-brands fa-github"></i></a>
+                <div class="page-number">7</div>
+            </div>
+            
+            <div id="page8" class="page page-right">
+                <div class="polaroid" >
+                <img src="Images\findmusic1.png" alt="FindMusic" style="height:20%;" >
+                <div class="polaroid-caption">Find Music Playlist Demo</div>
+                </div>
+                <div class="polaroid-row">
+                <div class="polaroid" >
+                    <img src="Images/findmusic2.jpg" alt="FindMusic" style=" height:5%;">
+                    <div class="polaroid-caption">Find Music Mobile Demo</div>
+                </div>
+
+                <div class="polaroid" >
+                    <img src="Images/findmusic3.jpg" alt="FindMusic" style="height:5%">
+                    <div class="polaroid-caption">Find Music Album Demo</div>
+                </div>
+                </div>
+
+                <div class="page-number">8</div>
+            </div>
+            <div id="page9" class="page page-left">
+                <h2>Guitar Hero Javascript Clone</h2>
+                <p>You may remember that I like music alot. I like music so much I made a game about it. </p>
+                <p>Guitar Hero is an old Xbox 5-key rhythm game, thats recently seen a resurgence in popularity, and is a game I've enjoyed playing since I was 10. So what better way to express my gratitude than with the sincerest form of flattery - imitation.
+                </p>
+                <p>There is not really much to say about this, its written in <span class="highlight">pure Javascript</span> using the 2d Canvas object and thats about it. I also wrote a <span class="highlight">Python script</span> to convert Guitar Hero charts into the format that my game can read from. </p>
+                <p>Now, without further ado, please enjoy my masterful gameplay in the next page.  </p>
+                <a href="https://github.com/cbhy3/guitar_hero" style="text-decoration: none;color:black;font-size:60px;"><i class="fa-brands fa-github"></i></a>
+                <div class="page-number">9</div>
+            </div>
+            
+            <div id="page10" class="page page-right">
+                <div class="polaroid" >
+                <video controls width="80%">
+                        <source src="Images\GuitarHero.mp4" type="video/mp4">
+                </video>
+                <div class="polaroid-caption">Sweet Child o' Mine</div>
+                </div>
+                
+
+                <div class="page-number">10</div>
+            </div>
+             <div id="page11" class="page page-left">
+                <h2>Velonix - Business App Development Project (WIP)</h2>
+                <p>This is a Music Streaming Platform I'm developing in <span class="highlight">ASP.Net Web Forms using C#</span> for a school module. Currently I've made all the <span class="highlight">music playing functionality</span>, as well as <span class="highlight">viewing and searching through albums, songs and artists. </span>  </p>
+                <p>The idea behind this is that most streaming platforms don't have any way to review or discuss music on the platform itself, usually users are forced to go to third-party websites to discuss, like AlbumOfTheYear.org. So what I'm trying to do is create a platform where users can discuss and listen to music all in one platform. 
+                </p>
+                <p>Since this is a Work-In-Progress project, <span class="highlight">the GitHub Repository is private, </span>so don't try to click the button.  </p>
+                
+                <a id="githubtroll" style="text-decoration: none;color:black;font-size:60px;"><i class="fa-brands fa-github"></i></a>
+                <div class="page-number">11</div>
+            </div>
+            
+            <div id="page12" class="page page-right">
+               <div class="polaroid" >
+                <img src="Images\Velonix1.png" alt="Home Page">
+                <div class="polaroid-caption">Music Player, Lyrics Sync and Queue</div>
+                </div>
+                <div class="polaroid-row">
+                <div class="polaroid" style="width:50%">
+                    <img src="Images/Velonix2.png" alt="PayNow QR Code" >
+                    <div class="polaroid-caption">Album Page</div>
+                </div>
+
+                <div class="polaroid" style="width:35%">
+                    <img src="Images/Velonix3.png" alt="Chatbot System">
+                    <div class="polaroid-caption">Artist Page</div>
+                </div>
+                </div>
+
+                
+
+                <div class="page-number">12</div>
+            </div>
+             <div id="page13" class="page page-left">
+               
+                <div class="page-number">13</div>
+            </div>
+            
+            <div id="page14" class="page page-right">
+              <h2 id="centered">Art Gallery</h2>
+
+                
+
+                <div class="page-number">14</div>
+            </div>
+            <div id="page15" class="page page-left">
+                <div class="polaroid" >
+                <img src="Images\johnny.png" alt="Home Page">
+                <div class="polaroid-caption">Johnny Silverhand and Adam Smasher</div>
+                </div>
+                
+                <div class="page-number">15</div>
+            </div>
+            
+            <div id="page16" class="page page-right">
+               
+                <div class="polaroid" >
+                <img src="Images\negan.png" alt="Home Page">
+                <div class="polaroid-caption">Negan and Glenn as Invincible </div>
+                </div>
+
+                <div class="page-number">16</div>
+            </div>
+            <div id="page17" class="page page-left">
+                <div class="polaroid" >
+                <img src="Images\sduperman.png" alt="Home Page">
+                <div class="polaroid-caption">Superman mogging Lex</div>
+                </div>
+                
+                <div class="page-number">17</div>
+            </div>
+            
+            <div id="page18" class="page page-right">
+               
+                <div class="polaroid" >
+                <img src="Images\supergi.jpg" alt="Home Page">
+                <div class="polaroid-caption"> supergirl </div>
+                </div>
+
+                <div class="page-number">18</div>
+            </div>
+             <div id="page19" class="page page-left">
+                <div class="polaroid" >
+                <img src="Images\rookie.png" alt="Home Page">
+                <div class="polaroid-caption">"The World's Worst Rookie"</div>
+                </div>
+                
+                <div class="page-number">19</div>
+            </div>
+            
+            <div id="page20" class="page page-right">
+               
+                <div class="polaroid" >
+                <img src="Images\sqr.png" alt="Home Page">
+                <div class="polaroid-caption"> squirrel girl nodiffs iron Fist </div>
+                </div>
+
+                <div class="page-number">20</div>
+            </div>
+            <div id="page21" class="page page-left">
+                <div class="polaroid" >
+                <img src="Images\idk2.jpg" alt="Home Page">
+                <div class="polaroid-caption"> commission, i forgot who this is</div>
+                </div>
+                
+                <div class="page-number">21</div>
+            </div>
+            
+            <div id="page22" class="page page-right">
+               
+                <div class="polaroid" >
+                <img src="Images\idk1.jpg" alt="Home Page">
+                <div class="polaroid-caption"> Another commission, i forgot who this is </div>
+                </div>
+
+                <div class="page-number">22</div>
+            </div>
+            <div id="page23" class="page page-left">
+                <div class="polaroid" >
+                <img src="Images\fantas3.jpg" alt="Home Page">
+                <div class="polaroid-caption">Pedro Pascal has too many roles</div>
+                </div>
+                
+                <div class="page-number">23</div>
+            </div>
+            
+            <div id="page24" class="page page-right">
+               
+                <div class="polaroid" >
+                <img src="Images\fantast2.jpg" alt="Home Page">
+                <div class="polaroid-caption"> fantastic</div>
+                </div>
+
+                <div class="page-number">24</div>
+            </div>
+            <div id="page25" class="page page-left">
+                <div class="polaroid" >
+                <img src="Images\fortntie2.png" alt="Home Page">
+                <div class="polaroid-caption">Omni Man vs Peter GrifFin Fortnite</div>
+                </div>
+                
+                <div class="page-number">25</div>
+            </div>
+            
+            <div id="page26" class="page page-right">
+               
+                <div class="polaroid" >
+                <video controls>
+                    <source src="Images/video.mp4" type="video/mp4">
+                    </video>
+                <div class="polaroid-caption"> I have No Idea I think this was for an assignment </div>
+                </div>
+
+                <div class="page-number">26</div>
+            </div>
+        </div>
+        
+        </div>
+        <script>
+            let currentSpread = 0;
+            let isAnimating = false;
+            let pagesList = document.querySelectorAll(".page");
+            let lastPage = parseInt(pagesList[pagesList.length - 1].id.match(/\d+/)[0]);
+            const noOfSpreads = pagesList.length/2;
+            const cover = document.getElementById('CoverFront');
+            const bookContainer = document.getElementById('bookContainer');
+            const flipPageContainerRight = document.getElementById('flipPageContainerRight');
+            const flipPageContainerLeft = document.getElementById('flipPageContainerLeft');
+            const pageShadow = document.querySelector('.page-shadow');
+            
+           document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById("githubtroll").addEventListener("click", (event)=>{
+                    event.stopPropagation();
+                    alert("You can't read?");
+                })
+                const polaroids = document.querySelectorAll('.polaroid');
+                
+                polaroids.forEach(polaroid => {
+                    const img = polaroid.querySelector('img');
+                    
+                    polaroid.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    // Create overlay
+                    const overlay = document.createElement('div');
+                    overlay.className = 'polaroid-overlay';
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.7);
+                        z-index: 999;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        backdrop-filter: blur(3px);
+                    `;
+                    
+                    // Clone and style the focused image
+                    const focusedImg = img.cloneNode(true);
+                    focusedImg.style.cssText = `
+                        max-width: 90vw;
+                        max-height: 90vh;
+                        width: auto;
+                        height: auto;
+                        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+                        cursor: pointer;
+                    `;
+                    
+                    // Hide original image (leaves empty frame)
+                    img.style.filter = 'contrast(0)';
+                    img.style.opacity = '0.3';
+                    img.style.pointerEvents = 'none';
+      
+                    // Add to overlay
+                    overlay.appendChild(focusedImg);
+                    document.body.appendChild(overlay);
+                    
+                    // Close on click
+                    overlay.addEventListener('click', () => {
+                        // Restore original image
+                         img.style.filter = 'none';
+                        img.style.opacity = '1';
+                        img.style.pointerEvents = 'auto';
+                        
+                        // Remove overlay
+                        overlay.remove();
+                    });
+                    });
+                });
+                });
+            // Click cover to open book
+            cover.addEventListener('click', () => {
+                cover.classList.add('hidden');
+                bookContainer.classList.add('active');
+                currentSpread = 1;
+                showSpread(currentSpread);
+            });
+            
+            function contentPageClick(page, event) {
+                event.stopPropagation();
+                event.preventDefault();
+                goToPage(page)
+            }
+            function goToPage(page) {
+                   const targetSpread = Math.ceil(page / 2);
+
+                    function step() {
+                        if (currentSpread === targetSpread) return;
+                        flipPageForward(
+                            document.getElementById(`page${currentSpread * 2 + 1}`),
+                            document.getElementById(`page${currentSpread * 2}`)
+                        );
+                        setTimeout(step, 600);
+                    }
+
+                    step();
+            }
+            pagesList.forEach(element => {
+                var pN = parseInt(element.id.match(/\d+/)[0]);
+                if (pN % 2 == 0) {
+                    document.getElementById(`page${pN}`).addEventListener('click', () => {
+                        if (!isAnimating) {
+                            if (pN !== lastPage) { 
+                                flipPageForward(document.getElementById(`page${pN+1}`), document.getElementById(`page${pN}`))
+                            }
+                        }
+                    })
+                }
+                else {
+                    document.getElementById(`page${pN}`).addEventListener('click', () => {
+                        if (!isAnimating) {
+                            if (pN == 1) { flipPageBack(document.getElementById(`page${pN}`), document.getElementById(`page${pN}`))}
+                            else {flipPageBack(document.getElementById(`page${pN-1}`), document.getElementById(`page${pN}`)) }
+                        }
+                    })
+                }
+            });
+            function showSpread(spread) {
+                const first = spread*2-1;
+                const second = spread*2;
+                pagesList.forEach(element => {
+                    var pN = parseInt(element.id.match(/\d+/)[0]);
+                    if (pN === first || pN === second) {
+                        element.classList.remove('hidden');
+                    }
+                    else {
+                        element.classList.add('hidden');
+                    }
+                });
+            }
+            
+            function flipPageForward(nextPage, currentPage) {
+                if (isAnimating) return;
+                isAnimating = true;
+                console.log(nextPage)
+                // Create flipping page on the right side
+                const flipPage = document.createElement('div');
+                flipPage.className = 'flip-page right';
+                
+                // Get content from next page
+                const nextContent = nextPage.innerHTML;
+                const h2Match = nextContent.match(/<h2>(.*?)<\/h2>/);
+                const h2Content = h2Match ? h2Match[0] : '';
+                const restContent = nextContent.replace(/<h2>.*?<\/h2>/, '').split('<div class="page-number">')[0];
+                
+                // Front side shows a blank/backside of page
+                // Back side shows the actual content
+                flipPage.innerHTML = `
+                    <div class="flip-front">
+                        <!-- Front is blank/backside of page -->
+                        <div class="flip-content">
+                            
+                        </div>
+                    </div>
+                    <div class="flip-back">
+                        <div class="flip-content">
+                            ${h2Content}
+                            ${restContent}
+                            <div class="flip-page-number">${nextPage.querySelector('.page-number').textContent}</div>
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => {
+                    currentSpread === noOfSpreads ? currentSpread = noOfSpreads: currentSpread += 1;
+                showSpread(currentSpread);
+                }, 400)
+                
+                flipPageContainerRight.appendChild(flipPage);
+                
+                // Add curling effect during animation
+                setTimeout(() => {
+                    flipPage.classList.add('curling');
+                }, 100);
+                
+                // Activate shadow
+                pageShadow.classList.add('active');
+                
+                // Animate the page flip from right to left
+                setTimeout(() => {
+                    flipPage.style.transform = `rotateY(-180deg)`;
+                    
+                    // Add subtle book movement
+                    bookContainer.classList.add('book-turn');
+                }, 50);
+                
+                // After animation completes
+                setTimeout(() => {
+                    // Update spread
+                    
+                    
+                    // Clean up
+                    flipPageContainerRight.removeChild(flipPage);
+                    pageShadow.classList.remove('active');
+                    bookContainer.classList.remove('book-turn');
+                    
+                    isAnimating = false;
+                }, 1200);
+            }
+            
+            function flipPageBack(prevPage, currentPage) {
+                if (isAnimating) return;
+                isAnimating = true;
+                
+                // Create flipping page on the left side
+                const flipPage = document.createElement('div');
+                flipPage.className = 'flip-page left';
+                
+                // Start from flipped position (already showing content)
+                flipPage.style.transform = `rotateY(0deg)`;
+                
+                // Get content from previous page
+                const prevContent = prevPage.innerHTML;
+                const h2Match = prevContent.match(/<h2>(.*?)<\/h2>/);
+                const h2Content = h2Match ? h2Match[0] : '';
+                const restContent = prevContent.replace(/<h2>.*?<\/h2>/, '').split('<div class="page-number">')[0];
+                
+                // Front side shows the content (since we start flipped)
+                // Back side is blank
+                flipPage.innerHTML = `
+                    <div class="flip-front">
+                        <div class="flip-content">
+                            
+                        </div>
+                    </div>
+                    <div class="flip-back">
+                        <div class="flip-content">
+                            ${h2Content}
+                            ${restContent}
+                            <div class="flip-page-number">${prevPage.querySelector('.page-number').textContent}</div>
+                        </div>
+                        
+                    </div>
+                `;
+                
+                flipPageContainerLeft.appendChild(flipPage);
+                
+                // Add curling effect during animation
+                setTimeout(() => {
+                    flipPage.classList.add('curling');
+                }, 100);
+                setTimeout(() => {
+                if (currentSpread > 1) {
+                        currentSpread--;
+                        showSpread(currentSpread);
+                    } else if (currentSpread === 1) {
+                        // Return to cover
+                        bookContainer.classList.remove('active');
+                        cover.classList.remove('hidden');
+                        currentSpread = 0;
+                    }
+                }
+                , 400)
+                // Activate shadow
+                pageShadow.classList.add('active');
+                
+                // Animate back to original position (flip from left to right)
+                setTimeout(() => {
+                    flipPage.style.transform = `rotateY(180deg)`;
+                    
+                    // Add subtle book movement
+                    bookContainer.classList.add('book-turn');
+                }, 50);
+                
+                // After animation completes
+                setTimeout(() => {
+                    // Update spread
+                    
+                    
+                    // Clean up
+                    flipPageContainerLeft.removeChild(flipPage);
+                    pageShadow.classList.remove('active');
+                    bookContainer.classList.remove('book-turn');
+                    
+                    isAnimating = false;
+                }, 1200);
+            }
+            
+           
+        </script>
+    </body>
+</html>
