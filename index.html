@@ -992,6 +992,7 @@
                         align-items: center;
                         justify-content: center;
                         backdrop-filter: blur(3px);
+                        
                     `;
                     
                     // Clone and style the focused image
@@ -999,10 +1000,11 @@
                     focusedImg.style.cssText = `
                         max-width: 90vw;
                         max-height: 90vh;
-                        width: auto;
-                        height: auto;
+                        width: 75vw;
+                        height: 65vh;
                         box-shadow: 0 20px 60px rgba(0,0,0,0.5);
                         cursor: pointer;
+                        object-fit: contain;
                     `;
                     
                     // Hide original image (leaves empty frame)
